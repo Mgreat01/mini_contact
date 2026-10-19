@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../domain/contact.dart';
 import '../domain/contact_repository.dart';
+import '../domain/contact_search.dart';
 import 'contact_form.dart';
 import 'contact_details.dart';
 
@@ -13,10 +14,19 @@ class ContactsPage extends StatefulWidget {
 
 class _ContactsPageState extends State<ContactsPage> {
   List<Contact> _contacts = [];
+  List<Contact> _visible = [];
   String _query = '';
   bool _loading = true;
   bool _saving = false;
   bool _loadFailed = false;
+
+  void _replaceContacts(List<Contact> contacts) {
+    _contacts = List.of(contacts)
+      ..sort((a, b) => normalizeContactText(a.name).compareTo(
+        normalizeContactText(b.name),
+      ));
+    _visible = searchContacts(_contacts, _query);
+  }
 
   @override
   void initState() {
@@ -31,7 +41,7 @@ class _ContactsPageState extends State<ContactsPage> {
     });
     try {
       final contacts = await widget.repository.load();
-      if (mounted) setState(() => _contacts = contacts);
+      if (mounted) setState(() => _replaceContacts(contacts));
     } catch (_) {
       if (mounted) setState(() => _loadFailed = true);
     } finally {
@@ -43,7 +53,7 @@ class _ContactsPageState extends State<ContactsPage> {
     setState(() => _saving = true);
     try {
       await widget.repository.save(contacts);
-      if (mounted) setState(() => _contacts = contacts);
+      if (mounted) setState(() => _replaceContacts(contacts));
     } catch (_) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -96,17 +106,7 @@ class _ContactsPageState extends State<ContactsPage> {
 
   @override
   Widget build(BuildContext context) {
-    final visible =
-        _contacts
-            .where(
-              (contact) => '${contact.name} ${contact.phone} ${contact.email}'
-                  .toLowerCase()
-                  .contains(_query.toLowerCase()),
-            )
-            .toList()
-          ..sort(
-            (a, b) => a.name.toLowerCase().compareTo(b.name.toLowerCase()),
-          );
+    final visible = _visible;
     return Scaffold(
       appBar: AppBar(title: const Text('Eli Contacts')),
       floatingActionButton: FloatingActionButton.extended(
@@ -137,8 +137,10 @@ class _ContactsPageState extends State<ContactsPage> {
                     Padding(
                       padding: const EdgeInsets.all(16),
                       child: TextField(
-                        onChanged: (value) =>
-                            setState(() => _query = value.trim()),
+                        onChanged: (value) => setState(() {
+                          _query = value.trim();
+                          _visible = searchContacts(_contacts, _query);
+                        }),
                         decoration: const InputDecoration(
                           hintText: 'Rechercher un contact',
                           prefixIcon: Icon(Icons.search),

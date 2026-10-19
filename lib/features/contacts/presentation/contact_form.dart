@@ -32,10 +32,11 @@ class _ContactFormState extends State<ContactForm> {
     if (!_key.currentState!.validate()) return;
     Navigator.pop(
       context,
-      Contact(
-        id:
-            widget.contact?.id ??
-            DateTime.now().microsecondsSinceEpoch.toString(),
+      (widget.contact ?? Contact(
+        id: DateTime.now().microsecondsSinceEpoch.toString(),
+        name: '',
+        phone: '',
+      )).copyWith(
         name: _name.text.trim(),
         phone: _phone.text.trim(),
         email: _email.text.trim(),

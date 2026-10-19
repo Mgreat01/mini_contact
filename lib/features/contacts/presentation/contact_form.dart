@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../domain/contact.dart';
+import 'label_picker.dart';
 
 class ContactForm extends StatefulWidget {
   const ContactForm({super.key, this.contact});
@@ -17,6 +18,8 @@ class _ContactFormState extends State<ContactForm> {
     text: widget.contact?.meetingContext,
   );
   late final _notes = TextEditingController(text: widget.contact?.notes);
+  late List<String> _circles = List.of(widget.contact?.circles ?? []);
+  late List<String> _tags = List.of(widget.contact?.tags ?? []);
 
   @override
   void dispose() {
@@ -42,6 +45,8 @@ class _ContactFormState extends State<ContactForm> {
         email: _email.text.trim(),
         meetingContext: _meetingContext.text.trim(),
         notes: _notes.text.trim(),
+        circles: _circles,
+        tags: _tags,
       ),
     );
   }
@@ -143,6 +148,21 @@ class _ContactFormState extends State<ContactForm> {
                   hintText: 'Ses passions, un souvenir partagé…',
                   alignLabelWithHint: true,
                 ),
+              ),
+              const SizedBox(height: 28),
+              LabelPicker(
+                title: 'Ses cercles',
+                inputLabel: 'Nouveau cercle',
+                selected: _circles,
+                suggestions: const ['Famille', 'Amis', 'Travail'],
+                onChanged: (value) => setState(() => _circles = value),
+              ),
+              const SizedBox(height: 20),
+              LabelPicker(
+                title: 'Mes repères',
+                inputLabel: 'Nouveau tag',
+                selected: _tags,
+                onChanged: (value) => setState(() => _tags = value),
               ),
             ],
           ),

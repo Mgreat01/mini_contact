@@ -93,9 +93,7 @@ class AttentionsPage extends StatelessWidget {
                     runSpacing: 4,
                     children: [
                       TextButton.icon(
-                        onPressed: saving ? null : () => onChanged(contact.copyWith(
-                          reminder: reminder.confirmContact(today ?? DateTime.now()),
-                        )),
+                        onPressed: saving ? null : () => onChanged(contact.confirmContact(today ?? DateTime.now())),
                         icon: const Icon(Icons.check),
                         label: const Text('J’ai pris contact'),
                       ),

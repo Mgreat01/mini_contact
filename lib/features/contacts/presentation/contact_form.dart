@@ -3,6 +3,8 @@ import '../domain/contact.dart';
 import 'label_picker.dart';
 import 'relationship_editor.dart';
 import '../domain/relationship_dates.dart';
+import '../domain/contact_interaction.dart';
+import 'interaction_history.dart';
 
 class ContactForm extends StatefulWidget {
   const ContactForm({super.key, this.contact});
@@ -24,6 +26,7 @@ class _ContactFormState extends State<ContactForm> {
   late List<String> _tags = List.of(widget.contact?.tags ?? []);
   late ContactReminder? _reminder = widget.contact?.reminder;
   late List<ImportantDate> _importantDates = List.of(widget.contact?.importantDates ?? []);
+  late List<ContactInteraction> _interactions = List.of(widget.contact?.interactions ?? []);
 
   @override
   void dispose() {
@@ -54,6 +57,7 @@ class _ContactFormState extends State<ContactForm> {
         reminder: _reminder,
         clearReminder: _reminder == null,
         importantDates: _importantDates,
+        interactions: _interactions,
       ),
     );
   }
@@ -177,6 +181,22 @@ class _ContactFormState extends State<ContactForm> {
                 dates: _importantDates,
                 onReminderChanged: (value) => setState(() => _reminder = value),
                 onDatesChanged: (value) => setState(() => _importantDates = value),
+              ),
+              const SizedBox(height: 28),
+              Text('Nos moments', style: Theme.of(context).textTheme.titleLarge),
+              const SizedBox(height: 12),
+              InteractionHistory(
+                interactions: _interactions,
+                onRemove: (value) => setState(() => _interactions = [
+                  ..._interactions.where((interaction) => interaction != value),
+                ]),
+              ),
+              InteractionEditor(
+                onConfirmed: (note) => setState(() {
+                  final now = DateTime.now();
+                  _interactions = [..._interactions, ContactInteraction(date: now, note: note)];
+                  _reminder = _reminder?.confirmContact(now);
+                }),
               ),
             ],
           ),

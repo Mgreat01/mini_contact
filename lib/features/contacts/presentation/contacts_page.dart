@@ -5,6 +5,8 @@ import '../domain/contact_search.dart';
 import 'contact_form.dart';
 import 'contact_details.dart';
 import 'contact_filters.dart';
+import 'attentions_page.dart';
+import 'dart:async';
 
 class ContactsPage extends StatefulWidget {
   const ContactsPage({super.key, required this.repository});
@@ -13,7 +15,7 @@ class ContactsPage extends StatefulWidget {
   State<ContactsPage> createState() => _ContactsPageState();
 }
 
-class _ContactsPageState extends State<ContactsPage> {
+class _ContactsPageState extends State<ContactsPage> with WidgetsBindingObserver {
   List<Contact> _contacts = [];
   List<Contact> _visible = [];
   String _query = '';
@@ -22,6 +24,34 @@ class _ContactsPageState extends State<ContactsPage> {
   bool _loading = true;
   bool _saving = false;
   bool _loadFailed = false;
+  int _tab = 0;
+  Timer? _calendarTimer;
+
+  void _refreshCalendar() {
+    _calendarTimer?.cancel();
+    final now = DateTime.now();
+    final midnight = DateTime(now.year, now.month, now.day + 1);
+    _calendarTimer = Timer(midnight.difference(now), () {
+      if (!mounted) return;
+      setState(() {});
+      _refreshCalendar();
+    });
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      setState(() {});
+      _refreshCalendar();
+    }
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    _calendarTimer?.cancel();
+    super.dispose();
+  }
 
   void _replaceContacts(List<Contact> contacts) {
     _contacts = List.of(contacts)
@@ -49,6 +79,8 @@ class _ContactsPageState extends State<ContactsPage> {
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
+    _refreshCalendar();
     _load();
   }
 
@@ -68,6 +100,7 @@ class _ContactsPageState extends State<ContactsPage> {
   }
 
   Future<void> _persist(List<Contact> contacts) async {
+    if (_saving) return;
     setState(() => _saving = true);
     try {
       await widget.repository.save(contacts);
@@ -83,6 +116,11 @@ class _ContactsPageState extends State<ContactsPage> {
     }
   }
 
+  Future<void> _updateContact(Contact contact) => _persist([
+    ..._contacts.where((item) => item.id != contact.id),
+    contact,
+  ]);
+
   Future<void> _edit([Contact? contact]) async {
     final result = await Navigator.push<Contact>(
       context,
@@ -93,10 +131,7 @@ class _ContactsPageState extends State<ContactsPage> {
       ),
     );
     if (result == null || !mounted) return;
-    await _persist([
-      ..._contacts.where((item) => item.id != result.id),
-      result,
-    ]);
+    await _updateContact(result);
   }
 
   Future<void> _delete(Contact contact) async {
@@ -126,12 +161,20 @@ class _ContactsPageState extends State<ContactsPage> {
   Widget build(BuildContext context) {
     final visible = _visible;
     return Scaffold(
-      appBar: AppBar(title: const Text('Eli Contacts')),
-      floatingActionButton: FloatingActionButton.extended(
+      appBar: AppBar(title: Text(_tab == 0 ? 'Eli Contacts' : 'À penser')),
+      bottomNavigationBar: NavigationBar(
+        selectedIndex: _tab,
+        onDestinationSelected: (index) => setState(() => _tab = index),
+        destinations: const [
+          NavigationDestination(icon: Icon(Icons.people_outline), label: 'Contacts'),
+          NavigationDestination(icon: Icon(Icons.favorite_border), label: 'À penser'),
+        ],
+      ),
+      floatingActionButton: _tab == 0 ? FloatingActionButton.extended(
         onPressed: _loading || _saving || _loadFailed ? null : () => _edit(),
         icon: const Icon(Icons.person_add_outlined),
         label: const Text('Ajouter un contact'),
-      ),
+      ) : null,
       body: Center(
         child: ConstrainedBox(
           constraints: const BoxConstraints(maxWidth: 800),
@@ -149,6 +192,18 @@ class _ContactsPageState extends State<ContactsPage> {
                       ),
                     ],
                   ),
+                )
+              : _tab == 1
+              ? Column(
+                  children: [
+                    if (_saving) const LinearProgressIndicator(),
+                    Expanded(child: AttentionsPage(
+                      contacts: _contacts,
+                      saving: _saving,
+                      onChanged: _updateContact,
+                      onOpen: _edit,
+                    )),
+                  ],
                 )
               : Column(
                   children: [

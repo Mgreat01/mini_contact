@@ -1,5 +1,6 @@
 # Miscellaneous
 .qodo/
+/docs/PLAN_REFONTE_HUMANISEE.md
 *.class
 *.log
 *.pyc

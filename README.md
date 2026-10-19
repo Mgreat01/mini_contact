@@ -54,7 +54,6 @@ ou de l'effacement des données du navigateur.
 
 ## Refonte humanisée
 
-Le [plan de refonte](docs/PLAN_REFONTE_HUMANISEE.md) décrit la cible produit.
 Le premier lot implémente le thème, les fiches narratives et leur recherche.
 Les cercles, rappels, chiffrement et échanges avec le carnet du téléphone restent
 à développer. Les notes utilisent pour l’instant le même stockage non chiffré

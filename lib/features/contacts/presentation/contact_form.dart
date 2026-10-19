@@ -74,9 +74,11 @@ class _ContactFormState extends State<ContactForm> {
         constraints: const BoxConstraints(maxWidth: 600),
         child: Form(
           key: _key,
-          child: ListView(
+          child: SingleChildScrollView(
             padding: const EdgeInsets.all(24),
-            children: [
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
               TextFormField(
                 controller: _name,
                 autofocus: true,
@@ -198,7 +200,8 @@ class _ContactFormState extends State<ContactForm> {
                   _reminder = _reminder?.confirmContact(now);
                 }),
               ),
-            ],
+              ],
+            ),
           ),
         ),
       ),

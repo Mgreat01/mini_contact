@@ -25,6 +25,8 @@ Application Flutter simple en français pour enregistrer des contacts.
 - Anniversaires sans année de naissance et autres dates annuelles ; le 29 février
   est célébré le 28 les années non bissextiles. Actualisation au changement de jour
   et au retour dans l’application.
+- Chronologie des échanges confirmés, avec souvenirs facultatifs et recherche
+  dans leur contenu ; aucune lecture des appels ni des messages du téléphone.
 
 ## Démarrer
 
@@ -72,7 +74,8 @@ que les coordonnées ; la refonte visuelle ne change pas cette propriété.
 Les nouveaux tests couvrent la lecture des anciennes fiches, la persistance des
 souvenirs, leur conservation lors d’une modification, les filtres combinés, la
 recherche normalisée et les règles de rappel et de calendrier. Les parcours
-de changement d’onglet et la persistance d’un report sont également couverts.
+de changement d’onglet, la persistance d’un report, la conservation des échanges
+et la validation du formulaire après défilement sont également couverts.
 Sur l’environnement de cette livraison, Flutter et Dart ne sont pas installés :
 les commandes de validation ci-dessous doivent être exécutées avec le SDK avant diffusion.
 

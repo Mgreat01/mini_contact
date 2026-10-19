@@ -87,6 +87,9 @@ void main() {
     await tester.pumpAndSettle();
     await tester.tap(find.text('Alice'));
     await tester.pumpAndSettle();
+    expect(find.text('Chaque lien a son histoire.'), findsOneWidget);
+    await tester.tap(find.byTooltip('Modifier le contact'));
+    await tester.pumpAndSettle();
     await tester.enterText(find.byType(TextFormField).at(0), 'Alicia');
     await tester.tap(find.text('Enregistrer'));
     await tester.pumpAndSettle();

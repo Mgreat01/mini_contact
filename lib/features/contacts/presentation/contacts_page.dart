@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../domain/contact.dart';
 import '../domain/contact_repository.dart';
 import 'contact_form.dart';
+import 'contact_details.dart';
 
 class ContactsPage extends StatefulWidget {
   const ContactsPage({super.key, required this.repository});
@@ -57,7 +58,11 @@ class _ContactsPageState extends State<ContactsPage> {
   Future<void> _edit([Contact? contact]) async {
     final result = await Navigator.push<Contact>(
       context,
-      MaterialPageRoute(builder: (_) => ContactForm(contact: contact)),
+      MaterialPageRoute(
+        builder: (_) => contact == null
+            ? const ContactForm()
+            : ContactDetails(contact: contact),
+      ),
     );
     if (result == null || !mounted) return;
     await _persist([
@@ -166,21 +171,31 @@ class _ContactsPageState extends State<ContactsPage> {
                               itemBuilder: (context, index) {
                                 final contact = visible[index];
                                 return ListTile(
-                                  leading: CircleAvatar(
-                                    child: Text(
-                                      contact.name.characters.first
-                                          .toUpperCase(),
+                                  leading: HeroMode(
+                                    enabled: !MediaQuery.disableAnimationsOf(context),
+                                    child: Hero(
+                                      tag: 'contact-avatar-${contact.id}',
+                                      child: CircleAvatar(
+                                        backgroundColor: Theme.of(context)
+                                            .colorScheme.secondaryContainer,
+                                        child: Text(
+                                          contact.name.characters.first
+                                              .toUpperCase(),
+                                        ),
+                                      ),
                                     ),
                                   ),
                                   title: Text(contact.name),
                                   subtitle: Text(
                                     [
-                                      contact.phone,
-                                      if (contact.email.isNotEmpty)
-                                        contact.email,
+                                      if (contact.meetingContext.isNotEmpty)
+                                        contact.meetingContext
+                                      else
+                                        contact.phone,
                                     ].join('\n'),
+                                    maxLines: 2,
+                                    overflow: TextOverflow.ellipsis,
                                   ),
-                                  isThreeLine: contact.email.isNotEmpty,
                                   onTap: _saving ? null : () => _edit(contact),
                                   trailing: IconButton(
                                     tooltip: 'Supprimer',

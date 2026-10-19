@@ -15,21 +15,32 @@ String normalizeContactText(String value) {
   return normalized.replaceAll(RegExp(r'[\u0300-\u036f]'), '');
 }
 
-List<Contact> searchContacts(List<Contact> contacts, String query) {
+List<Contact> searchContacts(
+  List<Contact> contacts,
+  String query, {
+  String? circle,
+  String? tag,
+}) {
+  final scoped = contacts.where((contact) =>
+    (circle == null || contact.circles.any((value) =>
+      normalizeContactText(value) == normalizeContactText(circle))) &&
+    (tag == null || contact.tags.any((value) =>
+      normalizeContactText(value) == normalizeContactText(tag))));
   final normalized = normalizeContactText(query.trim());
-  if (normalized.isEmpty) return List.of(contacts);
+  if (normalized.isEmpty) return scoped.toList();
   final tokens = normalized.split(RegExp(r'\s+'));
   final phoneQuery = RegExp(r'^\+?[\d\s().-]+$').hasMatch(normalized)
       ? normalized.replaceAll(RegExp(r'\D'), '')
       : '';
-  return contacts.where((contact) {
+  return scoped.where((contact) {
     if (phoneQuery.isNotEmpty &&
         contact.phone.replaceAll(RegExp(r'\D'), '').contains(phoneQuery)) {
       return true;
     }
     final text = normalizeContactText(
       '${contact.name} ${contact.phone} ${contact.email} '
-      '${contact.meetingContext} ${contact.notes}',
+      '${contact.meetingContext} ${contact.notes} '
+      '${contact.circles.join(' ')} ${contact.tags.join(' ')}',
     );
     return tokens.every(text.contains);
   }).toList();

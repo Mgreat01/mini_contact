@@ -4,6 +4,7 @@ import '../domain/contact_repository.dart';
 import '../domain/contact_search.dart';
 import 'contact_form.dart';
 import 'contact_details.dart';
+import 'contact_filters.dart';
 
 class ContactsPage extends StatefulWidget {
   const ContactsPage({super.key, required this.repository});
@@ -16,6 +17,8 @@ class _ContactsPageState extends State<ContactsPage> {
   List<Contact> _contacts = [];
   List<Contact> _visible = [];
   String _query = '';
+  String? _circle;
+  String? _tag;
   bool _loading = true;
   bool _saving = false;
   bool _loadFailed = false;
@@ -25,7 +28,22 @@ class _ContactsPageState extends State<ContactsPage> {
       ..sort((a, b) => normalizeContactText(a.name).compareTo(
         normalizeContactText(b.name),
       ));
-    _visible = searchContacts(_contacts, _query);
+    _filter();
+  }
+
+  void _filter() {
+    _visible = searchContacts(_contacts, _query, circle: _circle, tag: _tag);
+  }
+
+  Future<void> _chooseFilters() async {
+    final result = await showContactFilters(
+      context, contacts: _contacts, circle: _circle, tag: _tag,
+    );
+    if (result == null || !mounted) return;
+    setState(() {
+      (_circle, _tag) = result;
+      _filter();
+    });
   }
 
   @override
@@ -139,7 +157,7 @@ class _ContactsPageState extends State<ContactsPage> {
                       child: TextField(
                         onChanged: (value) => setState(() {
                           _query = value.trim();
-                          _visible = searchContacts(_contacts, _query);
+                          _filter();
                         }),
                         decoration: const InputDecoration(
                           hintText: 'Rechercher un contact',
@@ -150,11 +168,37 @@ class _ContactsPageState extends State<ContactsPage> {
                     if (_saving) const LinearProgressIndicator(),
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 16),
-                      child: Align(
-                        alignment: Alignment.centerLeft,
-                        child: Text('${visible.length} contact(s)'),
+                      child: Row(
+                        children: [
+                          Expanded(child: Text('${visible.length} contact(s)')),
+                          TextButton.icon(
+                            onPressed: _saving ? null : _chooseFilters,
+                            icon: const Icon(Icons.tune),
+                            label: const Text('Filtrer'),
+                          ),
+                        ],
                       ),
                     ),
+                    if (_circle != null || _tag != null)
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16),
+                        child: Align(
+                          alignment: Alignment.centerLeft,
+                          child: Wrap(
+                            spacing: 8,
+                            children: [
+                              if (_circle != null) InputChip(
+                                label: Text('Cercle : $_circle'),
+                                onDeleted: () => setState(() { _circle = null; _filter(); }),
+                              ),
+                              if (_tag != null) InputChip(
+                                label: Text('Tag : $_tag'),
+                                onDeleted: () => setState(() { _tag = null; _filter(); }),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
                     Expanded(
                       child: visible.isEmpty
                           ? Center(
@@ -173,6 +217,7 @@ class _ContactsPageState extends State<ContactsPage> {
                               itemBuilder: (context, index) {
                                 final contact = visible[index];
                                 return ListTile(
+                                  key: ValueKey(contact.id),
                                   leading: HeroMode(
                                     enabled: !MediaQuery.disableAnimationsOf(context),
                                     child: Hero(

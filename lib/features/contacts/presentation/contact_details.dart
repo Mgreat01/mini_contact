@@ -59,6 +59,20 @@ class ContactDetails extends StatelessWidget {
                 style: theme.textTheme.headlineMedium,
               ),
               const SizedBox(height: 32),
+              if (contact.circles.isNotEmpty || contact.tags.isNotEmpty) ...[
+                Wrap(
+                  spacing: 8,
+                  runSpacing: 8,
+                  children: [
+                    for (final circle in contact.circles)
+                      Chip(avatar: const Icon(Icons.people_outline, size: 18),
+                        label: Text('Cercle : $circle')),
+                    for (final tag in contact.tags)
+                      Chip(label: Text('#$tag')),
+                  ],
+                ),
+                const SizedBox(height: 24),
+              ],
               if (contact.meetingContext.isNotEmpty)
                 _StorySection(
                   title: 'Notre rencontre',

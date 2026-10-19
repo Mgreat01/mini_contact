@@ -1,4 +1,5 @@
 import 'relationship_dates.dart';
+import 'contact_interaction.dart';
 
 class Contact {
   const Contact({
@@ -12,6 +13,7 @@ class Contact {
     this.tags = const [],
     this.reminder,
     this.importantDates = const [],
+    this.interactions = const [],
   });
   final String id;
   final String name;
@@ -23,6 +25,7 @@ class Contact {
   final List<String> tags;
   final ContactReminder? reminder;
   final List<ImportantDate> importantDates;
+  final List<ContactInteraction> interactions;
 
   Contact copyWith({
     String? name,
@@ -35,6 +38,7 @@ class Contact {
     ContactReminder? reminder,
     bool clearReminder = false,
     List<ImportantDate>? importantDates,
+    List<ContactInteraction>? interactions,
   }) => Contact(
     id: id,
     name: name ?? this.name,
@@ -46,6 +50,12 @@ class Contact {
     tags: List.unmodifiable(tags ?? this.tags),
     reminder: clearReminder ? null : (reminder ?? this.reminder),
     importantDates: List.unmodifiable(importantDates ?? this.importantDates),
+    interactions: List.unmodifiable(interactions ?? this.interactions),
+  );
+
+  Contact confirmContact(DateTime date, {String note = ''}) => copyWith(
+    interactions: [...interactions, ContactInteraction(date: date, note: note)],
+    reminder: reminder?.confirmContact(date),
   );
 
   Map<String, dynamic> toJson() => {
@@ -59,6 +69,7 @@ class Contact {
     'tags': tags,
     if (reminder != null) 'reminder': reminder!.toJson(),
     'importantDates': importantDates.map((date) => date.toJson()).toList(),
+    'interactions': interactions.map((interaction) => interaction.toJson()).toList(),
   };
   factory Contact.fromJson(Map<String, dynamic> json) => Contact(
     id: json['id'] as String,
@@ -74,5 +85,7 @@ class Contact {
     ),
     importantDates: List.unmodifiable((json['importantDates'] as List<dynamic>? ?? [])
       .map((date) => ImportantDate.fromJson(date as Map<String, dynamic>))),
+    interactions: List.unmodifiable((json['interactions'] as List<dynamic>? ?? [])
+      .map((interaction) => ContactInteraction.fromJson(interaction as Map<String, dynamic>))),
   );
 }

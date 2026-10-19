@@ -9,6 +9,13 @@ Application Flutter simple en français pour enregistrer des contacts.
 - Liste triée par nom et suppression avec confirmation.
 - Sauvegarde locale conservée entre les lancements.
 - Interface Material 3 adaptée aux écrans mobiles et larges.
+- Thème chaleureux ivoire et terre cuite, champs et boutons arrondis.
+- Fiches narratives : contexte de rencontre et notes facultatives, conservés
+  lors des modifications ; les anciennes fiches restent compatibles.
+- Ouverture de fiche avec transition de l’avatar, désactivée lorsque le système
+  demande de réduire les animations. Modification accessible depuis la fiche.
+- Recherche par contexte et notes, tolérante aux accents français et au format
+  des numéros ; plusieurs mots peuvent correspondre à différents champs.
 
 ## Démarrer
 
@@ -44,6 +51,19 @@ Les contacts sont propres à l'application, sans synchronisation avec le carnet
 d'adresses du téléphone ni serveur. SharedPreferences convient à ce petit registre ;
 les données ne sont pas chiffrées et peuvent disparaître lors de la désinstallation
 ou de l'effacement des données du navigateur.
+
+## Refonte humanisée
+
+Le [plan de refonte](docs/PLAN_REFONTE_HUMANISEE.md) décrit la cible produit.
+Le premier lot implémente le thème, les fiches narratives et leur recherche.
+Les cercles, rappels, chiffrement et échanges avec le carnet du téléphone restent
+à développer. Les notes utilisent pour l’instant le même stockage non chiffré
+que les coordonnées ; la refonte visuelle ne change pas cette propriété.
+
+Les nouveaux tests couvrent la lecture des anciennes fiches, la persistance des
+souvenirs, leur conservation lors d’une modification et la recherche normalisée.
+Sur l’environnement de cette livraison, Flutter et Dart ne sont pas installés :
+les commandes de validation ci-dessous doivent être exécutées avec le SDK avant diffusion.
 
 ## Vérification
 

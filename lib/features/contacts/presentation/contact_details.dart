@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../domain/contact.dart';
 import 'contact_form.dart';
 import '../domain/relationship_dates.dart';
+import 'interaction_history.dart';
 
 class ContactDetails extends StatelessWidget {
   const ContactDetails({super.key, required this.contact});
@@ -86,6 +87,15 @@ class ContactDetails extends StatelessWidget {
                   text: contact.notes,
                   icon: Icons.favorite_border,
                 ),
+              if (contact.interactions.isNotEmpty) ...[
+                Semantics(
+                  header: true,
+                  child: Text('Nos moments', style: theme.textTheme.titleLarge),
+                ),
+                const SizedBox(height: 8),
+                InteractionHistory(interactions: contact.interactions),
+                const SizedBox(height: 24),
+              ],
               if (contact.meetingContext.isEmpty && contact.notes.isEmpty)
                 Padding(
                   padding: const EdgeInsets.only(bottom: 24),

@@ -71,7 +71,8 @@ class _SearchEntry {
       text = normalizeContactText(
         '${contact.name} ${contact.phone} ${contact.email} '
         '${contact.meetingContext} ${contact.notes} '
-        '${contact.circles.join(' ')} ${contact.tags.join(' ')}',
+        '${contact.circles.join(' ')} ${contact.tags.join(' ')} '
+        '${contact.interactions.map((interaction) => interaction.note).join(' ')}',
       );
 
   final Contact contact;

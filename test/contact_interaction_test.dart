@@ -1,6 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:eli_contacts/features/contacts/domain/contact.dart';
 import 'package:eli_contacts/features/contacts/domain/relationship_dates.dart';
+import 'package:eli_contacts/features/contacts/domain/contact_search.dart';
 
 void main() {
   test('Confirmer un échange conserve un souvenir et recalcule le rappel', () {
@@ -16,6 +17,7 @@ void main() {
     expect(restored.reminder!.dueDate, DateTime(2026, 11, 18));
     expect(restored.copyWith(clearReminder: true).interactions, hasLength(1));
     expect(restored.circles, ['Amis']);
+    expect(ContactSearchIndex([restored]).search('cafe partage').single.id, '1');
   });
 
   test('Un échange peut être conservé sans activer de rappel', () {

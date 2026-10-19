@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../domain/contact.dart';
 import 'contact_form.dart';
+import '../domain/relationship_dates.dart';
 
 class ContactDetails extends StatelessWidget {
   const ContactDetails({super.key, required this.contact});
@@ -107,6 +108,21 @@ class ContactDetails extends StatelessWidget {
                 ].join('\n'),
                 icon: Icons.contact_phone_outlined,
               ),
+              if (contact.reminder != null)
+                _StorySection(
+                  title: 'Garder le lien',
+                  text: 'Une attention tous les ${contact.reminder!.intervalDays} jours. '
+                    'Prochaine date : ${formatContactDate(contact.reminder!.dueDate)}.',
+                  icon: Icons.favorite_border,
+                ),
+              if (contact.importantDates.isNotEmpty)
+                _StorySection(
+                  title: 'Les dates qui comptent',
+                  text: contact.importantDates.map((date) =>
+                    '${date.title} · ${date.day.toString().padLeft(2, '0')}/'
+                    '${date.month.toString().padLeft(2, '0')}').join('\n'),
+                  icon: Icons.cake_outlined,
+                ),
             ],
           ),
         ),

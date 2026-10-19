@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import '../domain/contact.dart';
 import 'label_picker.dart';
+import 'relationship_editor.dart';
+import '../domain/relationship_dates.dart';
 
 class ContactForm extends StatefulWidget {
   const ContactForm({super.key, this.contact});
@@ -20,6 +22,8 @@ class _ContactFormState extends State<ContactForm> {
   late final _notes = TextEditingController(text: widget.contact?.notes);
   late List<String> _circles = List.of(widget.contact?.circles ?? []);
   late List<String> _tags = List.of(widget.contact?.tags ?? []);
+  late ContactReminder? _reminder = widget.contact?.reminder;
+  late List<ImportantDate> _importantDates = List.of(widget.contact?.importantDates ?? []);
 
   @override
   void dispose() {
@@ -47,6 +51,9 @@ class _ContactFormState extends State<ContactForm> {
         notes: _notes.text.trim(),
         circles: _circles,
         tags: _tags,
+        reminder: _reminder,
+        clearReminder: _reminder == null,
+        importantDates: _importantDates,
       ),
     );
   }
@@ -163,6 +170,13 @@ class _ContactFormState extends State<ContactForm> {
                 inputLabel: 'Nouveau tag',
                 selected: _tags,
                 onChanged: (value) => setState(() => _tags = value),
+              ),
+              const SizedBox(height: 28),
+              RelationshipEditor(
+                reminder: _reminder,
+                dates: _importantDates,
+                onReminderChanged: (value) => setState(() => _reminder = value),
+                onDatesChanged: (value) => setState(() => _importantDates = value),
               ),
             ],
           ),

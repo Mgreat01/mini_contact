@@ -16,6 +16,15 @@ Application Flutter simple en français pour enregistrer des contacts.
   demande de réduire les animations. Modification accessible depuis la fiche.
 - Recherche par contexte et notes, tolérante aux accents français et au format
   des numéros ; plusieurs mots peuvent correspondre à différents champs.
+- Cercles multiples et tags personnalisés, sélection par puces et filtres combinés.
+- Index de recherche en mémoire, reconstruit après chargement ou sauvegarde,
+  avec priorité aux noms exacts puis aux préfixes et conservation de la recherche
+  entre les onglets.
+- Onglet « À penser » : rappels récurrents volontaires, confirmation d’un échange,
+  report de sept jours et désactivation sans supprimer la fiche.
+- Anniversaires sans année de naissance et autres dates annuelles ; le 29 février
+  est célébré le 28 les années non bissextiles. Actualisation au changement de jour
+  et au retour dans l’application.
 
 ## Démarrer
 
@@ -54,13 +63,16 @@ ou de l'effacement des données du navigateur.
 
 ## Refonte humanisée
 
-Le premier lot implémente le thème, les fiches narratives et leur recherche.
-Les cercles, rappels, chiffrement et échanges avec le carnet du téléphone restent
-à développer. Les notes utilisent pour l’instant le même stockage non chiffré
+Le thème, les fiches narratives, les cercles, les tags et les rappels dans
+l’application sont implémentés. Les notifications système, le chiffrement et les
+échanges avec le carnet du téléphone restent à intégrer et valider.
+Les notes utilisent pour l’instant le même stockage non chiffré
 que les coordonnées ; la refonte visuelle ne change pas cette propriété.
 
 Les nouveaux tests couvrent la lecture des anciennes fiches, la persistance des
-souvenirs, leur conservation lors d’une modification et la recherche normalisée.
+souvenirs, leur conservation lors d’une modification, les filtres combinés, la
+recherche normalisée et les règles de rappel et de calendrier. Les parcours
+de changement d’onglet et la persistance d’un report sont également couverts.
 Sur l’environnement de cette livraison, Flutter et Dart ne sont pas installés :
 les commandes de validation ci-dessous doivent être exécutées avec le SDK avant diffusion.
 
@@ -75,9 +87,11 @@ flutter build web
 
 ## Git
 
-Branche principale : `main`. Commits courts suivant Conventional Commits :
+Branche principale : `main`. Les nouveaux commits sont limités à trois fichiers,
+tests et fichiers de verrouillage compris, avec messages en français.
+Commits courts suivant Conventional Commits :
 `chore:` pour l'initialisation, `feat:` pour les fonctionnalités, `test:` pour les
-tests et `docs:` pour la documentation. Aucun dépôt distant configuré.
+tests et `docs:` pour la documentation. Le dépôt distant est configuré sur GitHub.
 
 Ces conventions sont une base proposée : aucun ancien projet Flutter avec un
 historique Git n'était disponible dans les dossiers voisins inspectés.

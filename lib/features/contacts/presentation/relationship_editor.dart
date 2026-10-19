@@ -23,7 +23,7 @@ class RelationshipEditor extends StatelessWidget {
         birthday: birthday,
       ),
     );
-    if (result == null) return;
+    if (result == null || !context.mounted) return;
     final updated = List<ImportantDate>.of(dates);
     if (index == null) {
       updated.add(result);

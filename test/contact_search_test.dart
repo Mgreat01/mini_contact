@@ -37,4 +37,14 @@ void main() {
     expect(searchContacts(contacts, 'Nadia', circle: 'Travail'), isEmpty);
     expect(searchContacts(contacts, '', circle: 'Amis', tag: 'Autre'), isEmpty);
   });
+
+  test('Les noms exacts puis les préfixes précèdent les souvenirs', () {
+    final index = ContactSearchIndex(const [
+      Contact(id: '1', name: 'Zoé', phone: '123456789', notes: 'Amie de Nadia'),
+      Contact(id: '2', name: 'Nadia Martin', phone: '123456789'),
+      Contact(id: '3', name: 'Nadia', phone: '123456789'),
+    ]);
+    expect(index.search('nadia').map((contact) => contact.id), ['3', '2', '1']);
+    expect(index.search('').map((contact) => contact.id), ['1', '2', '3']);
+  });
 }

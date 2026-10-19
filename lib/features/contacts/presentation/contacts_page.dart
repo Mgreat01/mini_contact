@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import '../domain/contact.dart';
 import '../domain/contact_repository.dart';
@@ -6,7 +7,6 @@ import 'contact_form.dart';
 import 'contact_details.dart';
 import 'contact_filters.dart';
 import 'attentions_page.dart';
-import 'dart:async';
 
 class ContactsPage extends StatefulWidget {
   const ContactsPage({super.key, required this.repository});
@@ -18,6 +18,8 @@ class ContactsPage extends StatefulWidget {
 class _ContactsPageState extends State<ContactsPage> with WidgetsBindingObserver {
   List<Contact> _contacts = [];
   List<Contact> _visible = [];
+  ContactSearchIndex _searchIndex = ContactSearchIndex(const []);
+  final _searchController = TextEditingController();
   String _query = '';
   String? _circle;
   String? _tag;
@@ -50,19 +52,18 @@ class _ContactsPageState extends State<ContactsPage> with WidgetsBindingObserver
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
     _calendarTimer?.cancel();
+    _searchController.dispose();
     super.dispose();
   }
 
   void _replaceContacts(List<Contact> contacts) {
-    _contacts = List.of(contacts)
-      ..sort((a, b) => normalizeContactText(a.name).compareTo(
-        normalizeContactText(b.name),
-      ));
+    _searchIndex = ContactSearchIndex(contacts, sortByName: true);
+    _contacts = _searchIndex.contacts;
     _filter();
   }
 
   void _filter() {
-    _visible = searchContacts(_contacts, _query, circle: _circle, tag: _tag);
+    _visible = _searchIndex.search(_query, circle: _circle, tag: _tag);
   }
 
   Future<void> _chooseFilters() async {
@@ -210,6 +211,7 @@ class _ContactsPageState extends State<ContactsPage> with WidgetsBindingObserver
                     Padding(
                       padding: const EdgeInsets.all(16),
                       child: TextField(
+                        controller: _searchController,
                         onChanged: (value) => setState(() {
                           _query = value.trim();
                           _filter();

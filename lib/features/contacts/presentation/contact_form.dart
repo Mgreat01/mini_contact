@@ -13,12 +13,18 @@ class _ContactFormState extends State<ContactForm> {
   late final _name = TextEditingController(text: widget.contact?.name);
   late final _phone = TextEditingController(text: widget.contact?.phone);
   late final _email = TextEditingController(text: widget.contact?.email);
+  late final _meetingContext = TextEditingController(
+    text: widget.contact?.meetingContext,
+  );
+  late final _notes = TextEditingController(text: widget.contact?.notes);
 
   @override
   void dispose() {
     _name.dispose();
     _phone.dispose();
     _email.dispose();
+    _meetingContext.dispose();
+    _notes.dispose();
     super.dispose();
   }
 
@@ -33,6 +39,8 @@ class _ContactFormState extends State<ContactForm> {
         name: _name.text.trim(),
         phone: _phone.text.trim(),
         email: _email.text.trim(),
+        meetingContext: _meetingContext.text.trim(),
+        notes: _notes.text.trim(),
       ),
     );
   }
@@ -87,8 +95,7 @@ class _ContactFormState extends State<ContactForm> {
               TextFormField(
                 controller: _email,
                 keyboardType: TextInputType.emailAddress,
-                textInputAction: TextInputAction.done,
-                onFieldSubmitted: (_) => _submit(),
+                textInputAction: TextInputAction.next,
                 decoration: const InputDecoration(
                   labelText: 'Adresse e-mail (facultatif)',
                   prefixIcon: Icon(Icons.email_outlined),
@@ -103,14 +110,50 @@ class _ContactFormState extends State<ContactForm> {
                     : null,
               ),
               const SizedBox(height: 28),
-              FilledButton.icon(
-                onPressed: _submit,
-                icon: const Icon(Icons.check),
-                label: const Text('Enregistrer'),
+              Text(
+                'Une personne, une histoire',
+                style: Theme.of(context).textTheme.titleLarge,
+              ),
+              const SizedBox(height: 8),
+              const Text(
+                'Quelques mots pour vous souvenir de ce qui vous rapproche. '
+                'Ces informations sont facultatives.',
+              ),
+              const SizedBox(height: 20),
+              TextFormField(
+                controller: _meetingContext,
+                textCapitalization: TextCapitalization.sentences,
+                minLines: 1,
+                maxLines: 3,
+                decoration: const InputDecoration(
+                  labelText: 'Notre rencontre',
+                  hintText: 'À l’atelier de cuisine, en juin…',
+                  prefixIcon: Icon(Icons.waving_hand_outlined),
+                ),
+              ),
+              const SizedBox(height: 20),
+              TextFormField(
+                controller: _notes,
+                textCapitalization: TextCapitalization.sentences,
+                minLines: 3,
+                maxLines: 8,
+                decoration: const InputDecoration(
+                  labelText: 'Ce que je veux retenir',
+                  hintText: 'Ses passions, un souvenir partagé…',
+                  alignLabelWithHint: true,
+                ),
               ),
             ],
           ),
         ),
+      ),
+    ),
+    bottomNavigationBar: SafeArea(
+      minimum: const EdgeInsets.fromLTRB(24, 12, 24, 16),
+      child: FilledButton.icon(
+        onPressed: _submit,
+        icon: const Icon(Icons.check),
+        label: const Text('Enregistrer'),
       ),
     ),
   );
